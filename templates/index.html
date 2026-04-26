@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Screenshot Verification</title>
+    <!-- Modern Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 550px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #38bdf8;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        p.subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .upload-area {
+            border: 2px dashed #475569;
+            background-color: #0f172a;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #38bdf8;
+            background-color: #1a2333;
+        }
+
+        .upload-area p {
+            color: #94a3b8;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6);
+        }
+
+        .btn:disabled {
+            background: #334155;
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #result-container {
+            margin-top: 30px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 18px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 15px;
+            color: #a7f3d0;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 15px;
+            border-radius: 8px;
+            display: none;
+            object-fit: contain;
+        }
+
+        /* Loading Spinner */
+        .loader-container {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loader {
+            border: 3px solid #1e293b;
+            border-top: 3px solid #38bdf8;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Payment Scanner</h2>
+        <p class="subtitle">Upload a screenshot of the transaction</p>
+        
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click();">
+            <p id="upload-text">📸 Click or Drag & Drop image here</p>
+            <input type="file" id="file-input" accept="image/*">
+            <img id="preview" alt="Image Preview">
+        </div>
+
+        <button class="btn" id="upload-btn" disabled>Extract Transaction Data</button>
+        
+        <div class="loader-container" id="loader-container">
+            <div class="loader"></div>
+            <p style="color: #94a3b8; font-size: 14px;">Analyzing image...</p>
+        </div>
+
+        <div id="result-container">
+            <h3 style="color: #cbd5e1; font-size: 16px; margin-bottom: 5px;">Extracted Information:</h3>
+            <div class="result-box" id="parsed-result"></div>
+            
+            <details style="margin-top:20px; cursor: pointer;">
+                <summary style="color:#64748b; font-size:14px; user-select: none;">View Raw OCR Text</summary>
+                <div class="result-box" id="raw-result" style="font-size:12px; color:#64748b; margin-top: 10px; border-color: #1e293b;"></div>
+            </details>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+        const preview = document.getElementById('preview');
+        const uploadText = document.getElementById('upload-text');
+        const resultContainer = document.getElementById('result-container');
+        const parsedResult = document.getElementById('parsed-result');
+        const rawResult = document.getElementById('raw-result');
+        const loaderContainer = document.getElementById('loader-container');
+
+        // Handle image selection preview
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    uploadText.style.display = 'none';
+                }
+                reader.readAsDataURL(this.files[0]);
+                uploadBtn.disabled = false;
+                resultContainer.style.display = 'none';
+            }
+        });
+
+        // Handle the upload and extraction process
+        uploadBtn.addEventListener('click', async function() {
+            if (!fileInput.files[0]) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            uploadBtn.disabled = true;
+            loaderContainer.style.display = 'block';
+            resultContainer.style.display = 'none';
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    parsedResult.textContent = data.parsed_info;
+                    rawResult.textContent = data.raw_text;
+                    resultContainer.style.display = 'block';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('An error occurred during processing.');
+                console.error(error);
+            } finally {
+                uploadBtn.disabled = false;
+                loaderContainer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

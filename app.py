@@ -1,10 +1,16 @@
 from flask import Flask, request, render_template, jsonify
+from flask_cors import CORS
 import cv2
 import numpy as np
 import pytesseract
 from step1_webcam import parse_ocr_text
+from database import init_db, check_duplicate, insert_transaction
 
 app = Flask(__name__)
+CORS(app)
+
+# Initialize the database on startup
+init_db()
 
 # Note: On Windows, you might need to specify the tesseract executable path 
 # if it's not in your system PATH. Uncomment and update the path below if needed:
@@ -46,12 +52,38 @@ def upload():
         extracted_text = pytesseract.image_to_string(thresh).strip()
         
         # Parse the text using the function we built earlier
-        parsed_info = parse_ocr_text(extracted_text)
+        parsed_dict = parse_ocr_text(extracted_text)
         
+        # Format the dictionary back into a string for the frontend display
+        formatted_info = (
+            f"Transaction ID: {parsed_dict['transaction_id']}\n"
+            f"Sender Name: {parsed_dict['sender_name']}\n"
+            f"Receiver Name: {parsed_dict['receiver_name']}\n"
+            f"Amount: {parsed_dict['amount']}\n"
+            f"Date/Time: {parsed_dict['date_time']}"
+        )
+
+        tid = parsed_dict.get("transaction_id")
+        
+        # Check for duplicates
+        if tid != "Not Found" and check_duplicate(tid):
+            return jsonify({
+                'success': False,
+                'is_duplicate': True,
+                'raw_text': extracted_text,
+                'parsed_info': formatted_info,
+                'error': 'Duplicate Transaction Detected!'
+            })
+            
+        # If it's a valid new transaction, insert it into the database
+        if tid != "Not Found":
+            insert_transaction(parsed_dict)
+
         return jsonify({
             'success': True,
+            'is_duplicate': False,
             'raw_text': extracted_text,
-            'parsed_info': parsed_info
+            'parsed_info': formatted_info
         })
     except pytesseract.pytesseract.TesseractNotFoundError:
         return jsonify({'error': 'Tesseract OCR is not installed or not in your system PATH. Please uncomment line 11 in app.py and set the correct path to tesseract.exe.'})

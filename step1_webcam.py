@@ -81,7 +81,13 @@ def parse_ocr_text(ocr_text):
     sender = get_next_line(ocr_text, "Sent by")
     receiver = get_next_line(ocr_text, "Sent to")
 
-    return f"Transaction ID: {tid}\nSender Name: {sender}\nReceiver Name: {receiver}\nAmount: {amount}\nDate/Time: {date_time}"
+    return {
+        "transaction_id": tid,
+        "sender_name": sender,
+        "receiver_name": receiver,
+        "amount": amount,
+        "date_time": date_time
+    }
 
 def main():
     # Note: On Windows, you might need to specify the tesseract executable path 
@@ -141,7 +147,11 @@ def main():
                 
                 print("\n--- Parsed Information ---")
                 parsed_info = parse_ocr_text(extracted_text)
-                print(parsed_info)
+                print(f"Transaction ID: {parsed_info['transaction_id']}")
+                print(f"Sender Name: {parsed_info['sender_name']}")
+                print(f"Receiver Name: {parsed_info['receiver_name']}")
+                print(f"Amount: {parsed_info['amount']}")
+                print(f"Date/Time: {parsed_info['date_time']}")
             except Exception as e:
                 print("OCR Error:", e)
                 print("\nMake sure Tesseract-OCR is installed on your system.")

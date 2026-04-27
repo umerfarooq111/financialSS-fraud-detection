@@ -174,8 +174,10 @@
             <p style="color: #94a3b8; font-size: 14px;">Analyzing image...</p>
         </div>
 
+        <div id="status-banner" style="display: none; padding: 15px; border-radius: 8px; margin-top: 20px; font-weight: 600; text-align: center; font-size: 18px;"></div>
+
         <div id="result-container">
-            <h3 style="color: #cbd5e1; font-size: 16px; margin-bottom: 5px;">Extracted Information:</h3>
+            <h3 style="color: #cbd5e1; font-size: 16px; margin-bottom: 5px; margin-top: 20px;">Extracted Information:</h3>
             <div class="result-box" id="parsed-result"></div>
             
             <details style="margin-top:20px; cursor: pointer;">
@@ -194,6 +196,7 @@
         const parsedResult = document.getElementById('parsed-result');
         const rawResult = document.getElementById('raw-result');
         const loaderContainer = document.getElementById('loader-container');
+        const statusBanner = document.getElementById('status-banner');
 
         // Handle image selection preview
         fileInput.addEventListener('change', function() {
@@ -207,6 +210,7 @@
                 reader.readAsDataURL(this.files[0]);
                 uploadBtn.disabled = false;
                 resultContainer.style.display = 'none';
+                statusBanner.style.display = 'none';
             }
         });
 
@@ -222,13 +226,30 @@
             resultContainer.style.display = 'none';
 
             try {
-                const response = await fetch('/upload', {
+                // Use absolute URL so it works even when opening index.html directly
+                const response = await fetch('http://127.0.0.1:5000/upload', {
                     method: 'POST',
                     body: formData
                 });
                 const data = await response.json();
 
                 if (data.success) {
+                    statusBanner.style.display = 'block';
+                    statusBanner.style.backgroundColor = 'rgba(16, 185, 129, 0.2)'; // Green transparent
+                    statusBanner.style.color = '#34d399'; // Green text
+                    statusBanner.style.border = '1px solid #059669';
+                    statusBanner.textContent = '✅ VERIFIED';
+                    
+                    parsedResult.textContent = data.parsed_info;
+                    rawResult.textContent = data.raw_text;
+                    resultContainer.style.display = 'block';
+                } else if (data.is_duplicate) {
+                    statusBanner.style.display = 'block';
+                    statusBanner.style.backgroundColor = 'rgba(239, 68, 68, 0.2)'; // Red transparent
+                    statusBanner.style.color = '#f87171'; // Red text
+                    statusBanner.style.border = '1px solid #dc2626';
+                    statusBanner.textContent = '❌ ' + data.error;
+
                     parsedResult.textContent = data.parsed_info;
                     rawResult.textContent = data.raw_text;
                     resultContainer.style.display = 'block';

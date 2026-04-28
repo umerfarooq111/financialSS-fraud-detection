@@ -22,6 +22,17 @@ def init_db():
             scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS fraud_transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            transaction_id TEXT NOT NULL,
+            sender_name TEXT,
+            receiver_name TEXT,
+            amount TEXT,
+            date_time TEXT,
+            detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -71,3 +82,56 @@ def insert_transaction(data):
         conn.close()
     
     return success
+
+def insert_fraud_transaction(data):
+    """
+    Inserts a fraud transaction attempt into the database.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO fraud_transactions (transaction_id, sender_name, receiver_name, amount, date_time)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (
+        data.get("transaction_id"),
+        data.get("sender_name"),
+        data.get("receiver_name"),
+        data.get("amount"),
+        data.get("date_time")
+    ))
+    conn.commit()
+    conn.close()
+
+def get_total_transactions():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM transactions")
+    result = cursor.fetchone()[0]
+    conn.close()
+    return result
+
+def get_total_income():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT amount FROM transactions")
+    amounts = cursor.fetchall()
+    conn.close()
+    total = 0
+    for row in amounts:
+        amount_str = row[0]
+        if amount_str:
+            # Remove currency symbols and commas, assume format like "Rs. 1,000.00"
+            clean_amount = amount_str.replace('Rs.', '').replace(',', '').strip()
+            try:
+                total += float(clean_amount)
+            except ValueError:
+                pass
+    return total
+
+def get_total_fraud_transactions():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM fraud_transactions")
+    result = cursor.fetchone()[0]
+    conn.close()
+    return result

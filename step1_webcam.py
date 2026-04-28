@@ -43,13 +43,7 @@ def parse_ocr_text(ocr_text):
     OCR Text:
     {ocr_text}
     """
-    
-    # --- LLM API Call Example (Uncomment and configure to use) ---
-    # import google.generativeai as genai
-    # genai.configure(api_key="YOUR_API_KEY")
-    # model = genai.GenerativeModel('gemini-1.5-flash')
-    # response = model.generate_content(prompt)
-    # return response.text.strip()
+
     
     # --- Basic Offline/Regex Fallback ---
     import re
@@ -90,9 +84,6 @@ def parse_ocr_text(ocr_text):
     }
 
 def main():
-    # Note: On Windows, you might need to specify the tesseract executable path 
-    # if it's not in your system PATH. Uncomment and update the path below if needed:
-    # pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
     # Create the uploads folder if it doesn't exist already
     os.makedirs("uploads", exist_ok=True)

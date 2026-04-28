@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works - Payment Screenshot Verification</title>
+    <!-- Modern Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Mermaid for diagrams -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#38bdf8',
+                primaryTextColor: '#f8fafc',
+                primaryBorderColor: '#334155',
+                lineColor: '#38bdf8',
+                secondaryColor: '#1e293b',
+                tertiaryColor: '#0f172a'
+            }
+        });
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            padding: 60px;
+            animation: fadeInUp 1s ease-out;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #38bdf8, #06b6d4, #38bdf8);
+            border-radius: 27px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #38bdf8, #06b6d4, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-bottom: 50px;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            color: #38bdf8;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-title i {
+            margin-right: 15px;
+            font-size: 1.8rem;
+        }
+
+        .intro-section {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 50px;
+            border-left: 5px solid #38bdf8;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intro-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .intro-section p {
+            color: #cbd5e1;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .tech-item {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid #334155;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .tech-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(56, 189, 248, 0.3);
+            border-color: #38bdf8;
+        }
+
+        .tech-icon {
+            font-size: 3rem;
+            color: #38bdf8;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .tech-name {
+            font-weight: 600;
+            color: #f8fafc;
+            margin-bottom: 10px;
+        }
+
+        .tech-desc {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .steps-section {
+            margin-bottom: 60px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .step-card {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 18px;
+            padding: 30px;
+            border: 1px solid #334155;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #38bdf8, #06b6d4);
+            transition: width 0.4s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(56, 189, 248, 0.4);
+            border-color: #38bdf8;
+        }
+
+        .step-card:hover::before {
+            width: 8px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #38bdf8, #06b6d4);
+            color: #0f172a;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            box-shadow: 0 4px 10px rgba(56, 189, 248, 0.4);
+        }
+
+        .step-icon {
+            font-size: 1.5rem;
+            color: #38bdf8;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            color: #f8fafc;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .step-card p {
+            color: #a7f3d0;
+            line-height: 1.7;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .diagram-section {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid #334155;
+            margin-bottom: 60px;
+        }
+
+        .diagram-title {
+            color: #38bdf8;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .diagram-title i {
+            margin-right: 15px;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .benefits-section {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 60px;
+            border: 1px solid #334155;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .benefit-item {
+            text-align: center;
+            padding: 25px;
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .benefit-item:hover {
+            transform: scale(1.05);
+            background: rgba(56, 189, 248, 0.2);
+        }
+
+        .benefit-icon {
+            font-size: 2.5rem;
+            color: #38bdf8;
+            margin-bottom: 15px;
+        }
+
+        .benefit-title {
+            color: #f8fafc;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .benefit-desc {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .note {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            border: 1px solid #dc2626;
+            border-radius: 15px;
+            padding: 25px;
+            color: #fca5a5;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .note i {
+            margin-right: 10px;
+            color: #f87171;
+        }
+
+        .note strong {
+            color: #f87171;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+            .tech-stack {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-cogs"></i> How It Works</h1>
+        <p class="subtitle">Dive deep into the sophisticated workflow of our AI-powered Payment Screenshot Verification App</p>
+
+        <div class="intro-section">
+            <p><i class="fas fa-info-circle"></i> Welcome to the future of transaction verification! Our cutting-edge application revolutionizes the way payment screenshots are processed. By harnessing the power of Artificial Intelligence and Optical Character Recognition (OCR), we transform static images into actionable, verified data. Whether you're dealing with mobile banking receipts, digital wallet confirmations, or traditional transaction screenshots, our system ensures unparalleled accuracy and security.</p>
+            <p>Built on a robust Python ecosystem with Flask as the web framework, our app seamlessly integrates OpenCV for advanced image preprocessing and Tesseract for precise text extraction. The result? A lightning-fast, user-friendly solution that eliminates manual data entry and reduces human error to near zero.</p>
+            
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-tools"></i> Technology Stack</h2>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <i class="fab fa-python tech-icon"></i>
+                        <div class="tech-name">Python</div>
+                        <div class="tech-desc">Core programming language powering the backend logic and AI algorithms.</div>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-server tech-icon"></i>
+                        <div class="tech-name">Flask</div>
+                        <div class="tech-desc">Lightweight web framework handling HTTP requests and serving the web interface.</div>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-eye tech-icon"></i>
+                        <div class="tech-name">OpenCV</div>
+                        <div class="tech-desc">Computer vision library for image preprocessing and enhancement.</div>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-search tech-icon"></i>
+                        <div class="tech-name">Tesseract OCR</div>
+                        <div class="tech-desc">Google's OCR engine for accurate text extraction from images.</div>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-database tech-icon"></i>
+                        <div class="tech-name">SQLite</div>
+                        <div class="tech-desc">Lightweight database for storing and verifying transaction records.</div>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-html5 tech-icon"></i>
+                        <div class="tech-name">HTML5/CSS3</div>
+                        <div class="tech-desc">Modern web technologies for responsive, interactive user interfaces.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section steps-section">
+            <h2 class="section-title"><i class="fas fa-list-ol"></i> Detailed Workflow Steps</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <i class="fas fa-upload step-icon"></i>
+                        <div class="step-title">Image Upload</div>
+                    </div>
+                    <p>Users securely upload payment screenshots through our drag-and-drop web interface. The system accepts various image formats (PNG, JPG, JPEG) and performs immediate client-side validation to ensure file integrity and size limits.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <i class="fas fa-magic step-icon"></i>
+                        <div class="step-title">Image Preprocessing</div>
+                    </div>
+                    <p>Advanced image processing pipeline: 2x upscaling for detail enhancement, conversion to grayscale for contrast optimization, and adaptive thresholding to isolate text from background noise. This step significantly improves OCR accuracy.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <i class="fas fa-brain step-icon"></i>
+                        <div class="step-title">OCR Text Extraction</div>
+                    </div>
+                    <p>Tesseract OCR engine analyzes the preprocessed image, employing neural network-based recognition to extract raw text. The system handles multiple languages and font styles, ensuring comprehensive text capture from diverse screenshot sources.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">4</span>
+                        <i class="fas fa-cogs step-icon"></i>
+                        <div class="step-title">Intelligent Parsing</div>
+                    </div>
+                    <p>Custom regex-powered parser intelligently identifies and extracts key transaction fields: unique Transaction ID, sender/receiver names, monetary amounts, and timestamp data. The algorithm adapts to various banking app formats.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">5</span>
+                        <i class="fas fa-shield-alt step-icon"></i>
+                        <div class="step-title">Duplicate Verification</div>
+                    </div>
+                    <p>Database integrity check: The system queries the SQLite database to detect duplicate transactions based on unique Transaction IDs. This prevents fraud and ensures data consistency across multiple submissions.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">6</span>
+                        <i class="fas fa-save step-icon"></i>
+                        <div class="step-title">Data Storage & Response</div>
+                    </div>
+                    <p>Upon successful verification, new transactions are securely stored with timestamps. The system generates detailed JSON responses including parsed data, raw OCR text, and clear success/error indicators for seamless user feedback.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">7</span>
+                        <i class="fas fa-chart-line step-icon"></i>
+                        <div class="step-title">Result Presentation</div>
+                    </div>
+                    <p>Interactive web interface displays verification results with color-coded status indicators. Users can toggle between parsed transaction details and raw OCR output for transparency and debugging purposes.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section diagram-section">
+            <h2 class="diagram-title"><i class="fas fa-project-diagram"></i> Interactive Workflow Visualization</h2>
+            <div class="mermaid">
+                flowchart TD
+                    A[<i class="fas fa-upload"></i><br/>User Uploads<br/>Image] --> B[<i class="fas fa-server"></i><br/>Flask Receives<br/>Image]
+                    B --> C[<i class="fas fa-image"></i><br/>Preprocess Image<br/>Resize, Grayscale,<br/>Threshold]
+                    C --> D[<i class="fas fa-search"></i><br/>Tesseract OCR<br/>Extract Raw Text]
+                    D --> E[<i class="fas fa-cogs"></i><br/>Parse Text<br/>Extract Fields:<br/>ID, Sender, Receiver,<br/>Amount, Date]
+                    E --> F{<i class="fas fa-database"></i><br/>Check Database<br/>for Duplicate?}
+                    F -->|Yes| G[<i class="fas fa-exclamation-triangle"></i><br/>Show Duplicate<br/>Error]
+                    F -->|No| H[<i class="fas fa-plus"></i><br/>Insert into<br/>Database]
+                    H --> I[<i class="fas fa-check-circle"></i><br/>Show Success<br/>Display Parsed Info]
+                    G --> I
+                    I --> J[<i class="fas fa-flag-checkered"></i><br/>End]
+                    
+                    style A fill:#1e293b,stroke:#38bdf8,stroke-width:3px
+                    style B fill:#1e293b,stroke:#38bdf8,stroke-width:3px
+                    style C fill:#1e293b,stroke:#38bdf8,stroke-width:3px
+                    style D fill:#1e293b,stroke:#38bdf8,stroke-width:3px
+                    style E fill:#1e293b,stroke:#38bdf8,stroke-width:3px
+                    style F fill:#1e293b,stroke:#38bdf8,stroke-width:3px
+                    style G fill:#dc2626,stroke:#38bdf8,stroke-width:3px
+                    style H fill:#059669,stroke:#38bdf8,stroke-width:3px
+                    style I fill:#059669,stroke:#38bdf8,stroke-width:3px
+                    style J fill:#1e293b,stroke:#38bdf8,stroke-width:3px
+            </div>
+        </div>
+
+        <div class="section benefits-section">
+            <h2 class="section-title"><i class="fas fa-star"></i> Key Benefits & Features</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <i class="fas fa-bolt benefit-icon"></i>
+                    <div class="benefit-title">Lightning Fast Processing</div>
+                    <div class="benefit-desc">Advanced algorithms ensure sub-second processing times, making verification instantaneous even for high-volume transactions.</div>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-shield-alt benefit-icon"></i>
+                    <div class="benefit-title">Fraud Prevention</div>
+                    <div class="benefit-desc">Duplicate detection system prevents fraudulent submissions and maintains data integrity across all transactions.</div>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-brain benefit-icon"></i>
+                    <div class="benefit-title">AI-Powered Accuracy</div>
+                    <div class="benefit-desc">Machine learning-enhanced OCR and parsing deliver industry-leading accuracy rates for diverse screenshot formats.</div>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-mobile-alt benefit-icon"></i>
+                    <div class="benefit-title">Mobile-First Design</div>
+                    <div class="benefit-desc">Responsive web interface works seamlessly across all devices, from smartphones to desktop computers.</div>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-lock benefit-icon"></i>
+                    <div class="benefit-title">Secure & Private</div>
+                    <div class="benefit-desc">All processing happens server-side with no data persistence beyond verification. Images are not stored permanently.</div>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-code-branch benefit-icon"></i>
+                    <div class="benefit-title">Open Source Ready</div>
+                    <div class="benefit-desc">Built with extensible architecture, allowing easy integration of additional AI models and custom parsing rules.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="note">
+            <i class="fas fa-lightbulb"></i> <strong>Advanced Feature:</strong> For real-time testing and development, utilize our standalone webcam script (<code>step1_webcam.py</code>). This command-line tool captures live images from your camera, processes them instantly, and displays parsed results. Perfect for debugging and offline verification workflows. Run it with <code>python step1_webcam.py</code> in your terminal.
+        </div>
+    </div>
+</body>
+</html>

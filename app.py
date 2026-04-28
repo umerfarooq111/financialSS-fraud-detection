@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import pytesseract
 from step1_webcam import parse_ocr_text
-from database import init_db, check_duplicate, insert_transaction
+from database import init_db, check_duplicate, insert_transaction, insert_fraud_transaction, get_total_transactions, get_total_income, get_total_fraud_transactions
 
 app = Flask(__name__)
 CORS(app)
@@ -12,13 +12,15 @@ CORS(app)
 # Initialize the database on startup
 init_db()
 
-# Note: On Windows, you might need to specify the tesseract executable path 
-# if it's not in your system PATH. Uncomment and update the path below if needed:
-# pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
+
+@app.route('/how-it-works', methods=['GET'])
+def how_it_works():
+    return render_template('how_it_works.html')
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -67,6 +69,7 @@ def upload():
         
         # Check for duplicates
         if tid != "Not Found" and check_duplicate(tid):
+            insert_fraud_transaction(parsed_dict)
             return jsonify({
                 'success': False,
                 'is_duplicate': True,
@@ -91,6 +94,13 @@ def upload():
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)})
+
+@app.route('/admin', methods=['GET'])
+def admin():
+    total_transactions = get_total_transactions()
+    total_income = get_total_income()
+    total_fraud = get_total_fraud_transactions()
+    return render_template('admin.html', total_transactions=total_transactions, total_income=total_income, total_fraud=total_fraud)
 
 if __name__ == '__main__':
     print("Starting Web Server. Access it at http://127.0.0.1:5000")

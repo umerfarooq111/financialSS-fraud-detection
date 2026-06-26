@@ -1,10 +1,10 @@
-# 🔍 Real-Time Offline Payment Screenshot Verification & Fraud Detection System
+# Real-Time Offline Payment Screenshot Verification & Fraud Detection System
 
 A robust, real-time, and completely offline verification system designed to prevent payment screenshot fraud (such as screenshot reuse, digital fabrication, and replay attacks) in university canteens and retail setups. Using computer vision, OCR text extraction, and a local SQLite database, the system validates digital transaction receipts instantly.
 
 ---
 
-## 🎯 Project Purpose & Problem Statement
+## Project Purpose & Problem Statement
 
 In busy retail environments (like university canteens during rush hours), cashiers often struggle to manually verify the authenticity of mobile payments (e.g., Easypaisa, JazzCash, bank transfers). This leads to financial leakage via:
 * **Replay Attacks**: Reusing the same payment confirmation screenshot multiple times.
@@ -15,7 +15,7 @@ This system provides a **100% offline, high-speed solution** that captures/accep
 
 ---
 
-## 🏗️ System Architecture & Workflow
+## System Architecture & Workflow
 
 The following diagram illustrates the interaction between the student showing their phone, the input modules (webcam/manual upload), the extraction backend, and the local validation engine.
 
@@ -38,7 +38,7 @@ graph TD
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 * **Interactive Web Interface**: A sleek, dark-themed dashboard built with Google Inter font. It supports clicking and drag-and-drop file uploads, image preview, visual loader, and collapsible raw OCR debug views.
 * **Instant Verification Banners**: Visual status indicators (`✅ VERIFIED` in green, `❌ Duplicate Transaction Detected!` in red) to provide rapid cashier feedback.
@@ -49,23 +49,23 @@ graph TD
 
 ---
 
-## 📁 File Structure Reference
+## File Structure Reference
 
 Here are the key files inside the workspace:
 
-* 📄 [requirements.txt](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/requirements.txt) - List of required Python dependencies.
-* 📄 [app.py](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/app.py) - The main Flask backend server handling web uploads, OCR pipelines, and endpoints.
-* 📄 [database.py](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/database.py) - Helper functions for SQLite database connections, metrics tracking, and schema migrations.
-* 📄 [step1_webcam.py](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/step1_webcam.py) - A CLI utility implementing a live OpenCV webcam feed to capture and process screenshots on keypress.
-* 📁 `templates/` - Contains the HTML presentation templates:
-  * 📄 [index.html](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/templates/index.html) - Standard payment upload portal.
-  * 📄 [admin.html](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/templates/admin.html) - Stats panel summarizing verified revenue and fraudulent incidents.
-  * 📄 [how_it_works.html](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/templates/how_it_works.html) - Documentation and breakdown of the detection flow.
-* 📁 `uploads/` - Storage location for saved webcam snapshots and manual file uploads.
+* [requirements.txt](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/requirements.txt) - List of required Python dependencies.
+* [app.py](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/app.py) - The main Flask backend server handling web uploads, OCR pipelines, and endpoints.
+* [database.py](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/database.py) - Helper functions for SQLite database connections, metrics tracking, and schema migrations.
+* [step1_webcam.py](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/step1_webcam.py) - A CLI utility implementing a live OpenCV webcam feed to capture and process screenshots on keypress.
+* `templates/` - Contains the HTML presentation templates:
+  * [index.html](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/templates/index.html) - Standard payment upload portal.
+  * [admin.html](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/templates/admin.html) - Stats panel summarizing verified revenue and fraudulent incidents.
+  * [how_it_works.html](file:///c:/Users/umer5/Documents/AiProjects/fakeSSDetector/templates/how_it_works.html) - Documentation and breakdown of the detection flow.
+* `uploads/` - Storage location for saved webcam snapshots and manual file uploads.
 
 ---
 
-## 🔧 Prerequisites & Installation Guide
+## Prerequisites & Installation Guide
 
 Follow these steps to configure your environment and run the application.
 
@@ -113,7 +113,7 @@ pip install -r requirements.txt
 
 ---
 
-## ⚡ How to Run the Application
+## How to Run the Application
 
 ### Option A: Running the Web Interface (Recommended)
 This runs the full Flask server on your local machine and serves the web frontend:
@@ -143,7 +143,7 @@ This mode utilizes your system's webcam to capture snapshots of transaction scre
 
 ---
 
-## 💾 SQLite Database Structure
+## SQLite Database Structure
 
 The database `database.db` contains two tables created during startup:
 
@@ -173,7 +173,7 @@ Logs duplicate screenshots flagged during verification scans.
 
 ---
 
-## 🛠️ Troubleshooting Guide
+## Troubleshooting Guide
 
 ### 1. `TesseractNotFoundError`
 **Error Message**: `pytesseract.pytesseract.TesseractNotFoundError: tesseract is not installed or it's not in your PATH`
